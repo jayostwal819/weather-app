@@ -109,4 +109,4 @@ weatherForm.addEventListener('submit', (e) => { //we are setting an event listne
         }
     })
 })
-})
+}) 
