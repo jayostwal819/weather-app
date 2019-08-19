@@ -527,7 +527,7 @@ app.listen(3000,()=>{
 }) */
 
 //video 56 -> providing the default value if the address name was not proper or it is not given
-
+/*
 const geocode=require('./utils/geocode')
 const forecast=require('./utils/forecast')
 
@@ -641,4 +641,116 @@ app.get('*',(req,res)=>{
 })
 app.listen(3000,()=>{
     console.log("server started")
+}) */
+
+//video 67 -> deploying code to heroku
+
+const geocode=require('./utils/geocode')
+const forecast=require('./utils/forecast')
+
+const path = require('path') //we are using npm module to manipuate the path to reach to our desired directory
+const express = require('express');
+const hbs = require('hbs') //including hbs for partials
+
+const app = express();
+const port = process.env.PORT || 3000
+
+//define the paths for Express engine
+const publicDirectoryPath = path.join( __dirname,'../public')//it will take us to public directory where our html file is stored
+const viewsPath = path.join(__dirname,'../templates/views')
+const partialsPath = path.join(__dirname,'../templates/partials')//setting path
+
+//setup handlbars engine and views location
+app.set('view engine','hbs')
+app.set('views',viewsPath)
+hbs.registerPartials(partialsPath)
+
+//setup static directory to serve
+app.use(express.static(publicDirectoryPath)); //use is used to coustomize the server. express.static is used to return our current directory. it will return it to the use object. and use object will fetch the file in browser 
+
+app.get('',(req,res)=>{
+    res.render('index',{
+        title: 'weather app',
+        name: 'jay'
+    })
 })
+
+app.get('/about',(req,res)=>{
+    res.render('about',{
+        title: 'about me',
+        name: 'jay'
+    })
+})
+
+app.get('/help',(req,res)=>{
+    res.render('help',{
+        helpText: 'help requried',
+        title: 'about me',
+        name: 'jay'
+    })
+})
+
+app.get('/weather',(req,res)=>{
+    if(!req.query.address){
+        return res.send({ //here we are using return bcz there cannot be two res.send in same function. so if the above if condtiton is true thsn it will return value from herer and code in function will not be executed
+            error: 'You must provide address option'
+        })
+    }
+
+    geocode(req.query.address,(error,{longitude,lattitude,location} = {})=>{ //object destructuring
+        if(error)
+        {
+            return res.send({error}); //here we are using return bcz if there will be any sort of error then from here the flow will terminate and wont execute further. it is efficient way of error handling
+        }
+        
+        forecast(longitude, lattitude, (error, forecastdata) => {//we have changed the name from data to forecastdata because it will overwrite beacure forecast and geocode were havinf sme name
+            if(error)
+            {
+                return res.send({error})
+            }
+
+            res.send({
+                forecast: forecastdata,
+                location,
+                address: req.query.address
+            })
+            
+        })
+    })
+})
+
+//this is new subpart to understand query processing
+app.get('/products',(req,res)=>{
+    if(!req.query.search){
+        return res.send({ //here we are using return bcz there cannot be two res.send in same function. so if the above if condtiton is true thsn it will return value from herer and code in function will not be executed
+            error: 'You must provide search option'
+        })
+    }
+
+    console.log(req.query) //when we will type "http://localhost:3000/products?search=games&rating=5" this command will return value of searcha and rating
+    console.log(req.query.search) //this will return only serach value
+    res.send({
+        products:[]
+    })
+} )
+
+app.get('/help/*',(req,res)=>{
+    res.render('404',{
+        title: '404',
+        name: 'Jay',
+        errorMessage: 'help page not found'
+    })
+
+})
+
+app.get('*',(req,res)=>{
+    res.render('404',{
+        title: '404',
+        name: 'Jay',
+        errorMessage: 'page not found'
+    })
+})
+app.listen(port,()=>{
+    console.log("server started")
+})
+
