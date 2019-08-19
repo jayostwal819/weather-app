@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="/css/style.css">
+
+    </head>
+    <body>
+    <!--   <div class="main-content">
+           {{>header}} 
+       </div>
+       {{>footer}}
+
+       video 58 fetching loaction from searchbar -->
+
+       <div class="main-content">
+           {{>header}} 
+           <p>Use this site to get weather</p>
+
+           <form>
+               <input placeholder="location">
+               <button>Search</button>
+           </form>
+
+           <p id="message-1"></p>
+           <p id="message-2"></p>
+       </div>
+       {{>footer}} 
+
+        <script src="/js/app.js"></script> <!-- we are writing this here bcz we want this file to be loaded after the above code is loaded otherwise the code will not be loaded in this file
+
+    </body>
+</html>
